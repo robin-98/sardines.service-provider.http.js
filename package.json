@@ -1,0 +1,50 @@
+{
+    "author": {
+        "email": "robin@naturewake.com",
+        "name": "Robin Sun"
+    },
+    "bugs": {
+        "url": "https://github.com/robin-98/sardines.shoal.service-provider.http.js/issues"
+    },
+    "dependencies": {
+        "@types/formidable": "^1.0.31",
+        "@types/koa": "^2.0.48",
+        "@types/koa-router": "^7.0.40",
+        "@types/koa-send": "^4.1.2",
+        "@types/koa2-cors": "^2.0.1",
+        "chalk": "^2.4.2",
+        "formidable": "^1.2.1",
+        "koa": "^2.7.0",
+        "koa-router": "^7.4.0",
+        "koa-send": "^5.0.0",
+        "koa2-cors": "^2.0.6",
+        "sardines-utils": "file:../sardines.utils.js",
+        "typescript": "^3.4.5",
+        "webrew-helpers-log": "0.0.7"
+    },
+    "description": "A built-in service provider for sardines.shoal.js",
+    "devDependencies": {},
+    "homepage": "https://github.com/robin-98/sardines.shoal.service-provider.http.js#readme",
+    "keywords": [
+        "Free-to-Decompose",
+        "distributed",
+        "framework",
+        "FaaS"
+    ],
+    "license": "ISC",
+    "main": "lib/prod/index.js",
+    "name": "sardines-shoal-service-provider-http",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/robin-98/sardines.shoal.service-provider.http.js.git"
+    },
+    "scripts": {
+        "buildProd": "tsc --build conf/tsconfig.prod.json",
+        "prod": "npm run buildProd && node lib/prod/index.js",
+        "buildDev": "tsc --build conf/tsconfig.dev.json",
+        "dev": "npm run buildDev && node lib/dev/index.js",
+        "test": "mocha test/index.js",
+        "clear": "rm -rf lib/*"
+    },
+    "version": "0.0.1"
+}
