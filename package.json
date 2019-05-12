@@ -4,7 +4,7 @@
         "name": "Robin Sun"
     },
     "bugs": {
-        "url": "https://github.com/robin-98/sardines.shoal.service-provider.http.js/issues"
+        "url": "https://github.com/robin-98/sardines.service-provider.http.js/issues"
     },
     "dependencies": {
         "@types/formidable": "^1.0.31",
@@ -22,9 +22,9 @@
         "typescript": "^3.4.5",
         "webrew-helpers-log": "0.0.7"
     },
-    "description": "A built-in service provider for sardines.shoal.js",
+    "description": "A built-in service provider for sardines.js",
     "devDependencies": {},
-    "homepage": "https://github.com/robin-98/sardines.shoal.service-provider.http.js#readme",
+    "homepage": "https://github.com/robin-98/sardines.service-provider.http.js#readme",
     "keywords": [
         "Free-to-Decompose",
         "distributed",
@@ -33,10 +33,10 @@
     ],
     "license": "ISC",
     "main": "lib/prod/index.js",
-    "name": "sardines-shoal-service-provider-http",
+    "name": "sardines-service-provider-http",
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/robin-98/sardines.shoal.service-provider.http.js.git"
+        "url": "git+https://github.com/robin-98/sardines.service-provider.http.js.git"
     },
     "scripts": {
         "buildProd": "tsc --build conf/tsconfig.prod.json",

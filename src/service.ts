@@ -4,83 +4,23 @@ import * as KoaSend from 'koa-send'
 import * as fs from 'fs'
 
 // Enums for service settings
-export enum HttpServiceInputParamPosition {
-    body = 'body',
-    ctx = 'ctx',
-    session = 'session',
-    files = 'files',
-    header = 'header',
-    query = 'query',
-    cookies = 'cookies',
-
-}
-
-export enum HttpServiceInputParamType {
-    object = 'object'
-}
-
-export enum HttpServiceMethod {
-    GET = 'get',
-    PUT = 'put',
-    POST = 'post', 
-    HEADER = 'header',
-    OPTIONS = 'options',
-    DEL = 'del',
-    DELETE = 'delete'
-}
-
-export enum HttpServiceResponseType {
-    static = 'static',
-    file = 'file',
-    html = 'html',
-    render = 'render',
-    handler = 'handler',
-    JSON = 'json',
-    text = 'text',
-    string = 'string'
-}
-
-// Interfaces for the service settings 
-export interface HttpServiceResponse {
-    type: HttpServiceResponseType
-    path?: string|any[]
-}
-
-export interface HttpServiceInputParameter {
-    position: HttpServiceInputParamPosition
-    type?: HttpServiceInputParamType
-    name?: string
-}
-
-export interface HttpServiceSettings {
-    protocol?: Http.Protocol
-    path?: string
-    method?: HttpServiceMethod
-    handler?: any
-    inputParameters?: HttpServiceInputParameter[]
-    response?: HttpServiceResponse
-    middlewares?: any[]
-    postProcesses?: any[]
-    summary?: string
-}
-
-export const defaultHttpServiceSettings: HttpServiceSettings = {
-    protocol: Http.Protocol.HTTP,
+export const defaultHttpServiceSettings: utils.Http.ServiceSettings = {
+    protocol: utils.Http.Protocol.HTTP,
     path: '/',
-    method: HttpServiceMethod.POST,
+    method: utils.Http.Method.POST,
     inputParameters: [{
-            position: HttpServiceInputParamPosition.body,
-            type: HttpServiceInputParamType.object
+            position: utils.Http.ServiceInputParamPosition.body,
+            type: utils.Http.ServiceInputParamType.object
     }],
     middlewares: [],
     postProcesses: [],
     response: {
-        type: HttpServiceResponseType.JSON
+        type: utils.Http.ServiceResponseType.JSON
     }
 }
 
 // Helper functions for registering services on the server
-export const summaryServiceSettings = (serviceSettings: HttpServiceSettings): string => {
+export const summaryServiceSettings = (serviceSettings: utils.Http.ServiceSettings): string => {
     return `${serviceSettings.protocol!.toUpperCase()}@${serviceSettings.method!}:${serviceSettings.path!}`
 }
 
@@ -88,22 +28,22 @@ const joinPath = (root: string, servicePath?: string): string => {
     return `${root}${Http.validatePath(servicePath)}`.replace(/\/+/g, '/')
 }
 
-const unifyServiceSettings = (serviceSettings: HttpServiceSettings, serverSettings: Http.HttpServiceProviderSettings): HttpServiceSettings|string => {
+const unifyServiceSettings = (serviceSettings: utils.Http.ServiceSettings, serverSettings: Http.HttpServiceProviderSettings): utils.Http.ServiceSettings|string => {
     const serviceSummary = summaryServiceSettings(serviceSettings)
     serviceSettings.summary = serviceSummary
     // Validation
-    if (!(serviceSettings.protocol!.toLocaleLowerCase() in Http.Protocol)) {
+    if (!(serviceSettings.protocol!.toLocaleLowerCase() in utils.Http.Protocol)) {
         return `Invalid protocol <${serviceSettings.protocol}> for registering service [${serviceSummary}]`
     }
-    if (!(serviceSettings.method!.toLocaleLowerCase() in HttpServiceMethod)) {
+    if (!(serviceSettings.method!.toLocaleLowerCase() in utils.Http.Method)) {
         return `Invalid method <${serviceSettings.method}> for registering service [${serviceSummary}]`
     }
     // Unifying
-    serviceSettings.protocol = Http.Protocol[serviceSettings.protocol!.toLocaleLowerCase() as keyof typeof Http.Protocol]
-    serviceSettings.method = HttpServiceMethod[serviceSettings.method!.toLocaleLowerCase() as keyof typeof HttpServiceMethod]
-    serviceSettings.response!.type = HttpServiceResponseType[serviceSettings.response!.type.toLocaleLowerCase() as keyof typeof HttpServiceResponseType]
+    serviceSettings.protocol = utils.Http.Protocol[serviceSettings.protocol!.toLocaleLowerCase() as keyof typeof utils.Http.Protocol]
+    serviceSettings.method = utils.Http.Method[serviceSettings.method!.toLocaleLowerCase() as keyof typeof utils.Http.Method]
+    serviceSettings.response!.type = utils.Http.ServiceResponseType[serviceSettings.response!.type.toLocaleLowerCase() as keyof typeof utils.Http.ServiceResponseType]
     serviceSettings.path = joinPath(serverSettings.root!, serviceSettings.path)
-    if (serviceSettings.response!.type === HttpServiceResponseType.static || serviceSettings.response!.type === HttpServiceResponseType.file) {
+    if (serviceSettings.response!.type === utils.Http.ServiceResponseType.static || serviceSettings.response!.type === utils.Http.ServiceResponseType.file) {
         if (!(serviceSettings.response!.path)) {
             serviceSettings.response!.path = './'
         }
@@ -116,9 +56,9 @@ const unifyServiceSettings = (serviceSettings: HttpServiceSettings, serverSettin
     }
     // Unifying input parameters
     for (let paramDef of serviceSettings.inputParameters!) {
-        paramDef.position = HttpServiceInputParamPosition[paramDef.position.toLocaleLowerCase() as keyof typeof HttpServiceInputParamPosition]
+        paramDef.position = utils.Http.ServiceInputParamPosition[paramDef.position.toLocaleLowerCase() as keyof typeof utils.Http.ServiceInputParamPosition]
         if (paramDef.type) {
-            paramDef.type = HttpServiceInputParamType[paramDef.type.toLocaleLowerCase() as keyof typeof HttpServiceInputParamType]
+            paramDef.type = utils.Http.ServiceInputParamType[paramDef.type.toLocaleLowerCase() as keyof typeof utils.Http.ServiceInputParamType]
         }
         if (typeof paramDef.name === 'undefined') {
             paramDef.name = ''
@@ -142,16 +82,16 @@ const readFile = (filepath: string): Promise<any> => (
 
 // parameter extractor
 // Extract parameters = require(request according to their definition
-const extractParams = (ctx: any, paramDef?: HttpServiceInputParameter[]): Promise<any> => {
+const extractParams = (ctx: any, paramDef?: utils.Http.ServiceInputParameter[]): Promise<any> => {
     return new Promise((resolve, reject) => {
-        const parameters: HttpServiceInputParameter|null[] = [];
-        const pd = paramDef || [{ position: HttpServiceInputParamPosition.body, type: HttpServiceInputParamType.object, name: '' }];
+        const parameters: utils.Http.ServiceInputParameter|null[] = [];
+        const pd = paramDef || [{ position: utils.Http.ServiceInputParamPosition.body, type: utils.Http.ServiceInputParamType.object, name: '' }];
         if (pd && Array.isArray(pd) && pd.length > 0) {
             pd.forEach((p) => {
                 if (typeof p === 'object' && p.position && (typeof p.name === 'string' || p.name === undefined)) {
                     const param = Object.assign({}, { position: 'body', type: 'object', name: '' }, p);
                     switch (param.position) {
-                        case HttpServiceInputParamPosition.ctx:
+                        case utils.Http.ServiceInputParamPosition.ctx:
                         if (param.name === undefined || param.name === '') {
                             parameters.push(ctx);
                         } else {
@@ -159,7 +99,7 @@ const extractParams = (ctx: any, paramDef?: HttpServiceInputParameter[]): Promis
                         }
                         break;
 
-                        case HttpServiceInputParamPosition.session:
+                        case utils.Http.ServiceInputParamPosition.session:
                         if (param.name === undefined || param.name === '') {
                             parameters.push(ctx.session);
                         } else if (ctx.session && typeof ctx.session === 'object') {
@@ -169,7 +109,7 @@ const extractParams = (ctx: any, paramDef?: HttpServiceInputParameter[]): Promis
                         }
                         break;
 
-                        case HttpServiceInputParamPosition.body:
+                        case utils.Http.ServiceInputParamPosition.body:
                         if (param.name === undefined || param.name === '') {
                             parameters.push(ctx.request.body);
                         } else {
@@ -177,7 +117,7 @@ const extractParams = (ctx: any, paramDef?: HttpServiceInputParameter[]): Promis
                         }
                         break;
                         
-                        case HttpServiceInputParamPosition.files:
+                        case utils.Http.ServiceInputParamPosition.files:
                         if (param.name === undefined || param.name === '') {
                             parameters.push(ctx.request.files);
                         } else {
@@ -185,7 +125,7 @@ const extractParams = (ctx: any, paramDef?: HttpServiceInputParameter[]): Promis
                         }
                         break;
                         
-                        case HttpServiceInputParamPosition.header:
+                        case utils.Http.ServiceInputParamPosition.header:
                         if (param.name === undefined || param.name === '') {
                             parameters.push(ctx.request.header);
                         } else {
@@ -193,7 +133,7 @@ const extractParams = (ctx: any, paramDef?: HttpServiceInputParameter[]): Promis
                         }
                         break;
                         
-                        case HttpServiceInputParamPosition.query:
+                        case utils.Http.ServiceInputParamPosition.query:
                         if (param.name === undefined || param.name === '') {
                             parameters.push(ctx.request.query);
                         } else {
@@ -201,7 +141,7 @@ const extractParams = (ctx: any, paramDef?: HttpServiceInputParameter[]): Promis
                         }
                         break;
 
-                        case HttpServiceInputParamPosition.cookies:
+                        case utils.Http.ServiceInputParamPosition.cookies:
                         if (param.name === undefined || param.name === '') {
                             parameters.push(ctx.cookies);
                         } else {
@@ -228,7 +168,7 @@ export class HttpServiceProviderService extends Http.HttpServiceProviderServer {
         super(serverSettings)
     }
 
-    registerService(originalServiceSettings: HttpServiceSettings): Promise<any> {
+    registerService(originalServiceSettings: utils.Http.ServiceSettings): Promise<any> {
         // Unify the service settings
         const serviceSettings = unifyServiceSettings(originalServiceSettings, this.serverSettings)
         if (typeof serviceSettings === 'string') {
@@ -320,11 +260,11 @@ export class HttpServiceProviderService extends Http.HttpServiceProviderServer {
             utils.inspectedDebugLog(`${this.logMesgHeader} extracted input from invocation`, params);
             let res = await serviceSettings.handler!(...params);
             switch (serviceSettings.response!.type) {
-                case HttpServiceResponseType.text: case HttpServiceResponseType.string:
+                case utils.Http.ServiceResponseType.text: case utils.Http.ServiceResponseType.string:
                 ctx.body = res;
                 break;
 
-                case HttpServiceResponseType.JSON:
+                case utils.Http.ServiceResponseType.JSON:
                 default: // JSON
                 if (typeof res !== 'object' || res === null) res = { res };
                 ctx.body = res;
@@ -338,26 +278,26 @@ export class HttpServiceProviderService extends Http.HttpServiceProviderServer {
             self.init().then((/* public server info is not useful here */) => {
                 try {
                     switch (serviceSettings.response!.type) {
-                        case HttpServiceResponseType.static: case HttpServiceResponseType.file:
+                        case utils.Http.ServiceResponseType.static: case utils.Http.ServiceResponseType.file:
                         self.router[serviceSettings.method!](serviceSettings.path, async(ctx:any , next: any) => {
                             const filePath = (serviceSettings.path!.length > 2) ? ctx.path.substr(serviceSettings.path!.length - 2) : ctx.path
                             await processService(async () => await sendStaticFile(filePath, ctx), ctx, next)
                         })
                         break
 
-                        case HttpServiceResponseType.html: case HttpServiceResponseType.render:
+                        case utils.Http.ServiceResponseType.html: case utils.Http.ServiceResponseType.render:
                         self.router[serviceSettings.method!](serviceSettings.path, async(ctx:any, next: any) => {
                             await processService(async () => await sendText(ctx), ctx, next)
                         })
                         break
 
-                        case HttpServiceResponseType.handler:
+                        case utils.Http.ServiceResponseType.handler:
                         self.router[serviceSettings.method!](serviceSettings.path, async(ctx:any, next: any) => {
                             await processService(async () => await serviceSettings.handler(ctx), ctx, next)
                         })
                         break
 
-                        case HttpServiceResponseType.JSON: case HttpServiceResponseType.string: case HttpServiceResponseType.text:
+                        case utils.Http.ServiceResponseType.JSON: case utils.Http.ServiceResponseType.string: case utils.Http.ServiceResponseType.text:
                         default:
                         self.router[serviceSettings.method!](serviceSettings.path, async(ctx:any, next: any) => {
                             await processService(async () => await execCustomService(ctx), ctx, next)

@@ -5,12 +5,6 @@ import * as formidable from 'formidable'
 import * as Cors from 'koa2-cors'
 import * as Router from 'koa-router'
 
-export enum Protocol {
-    HTTP = 'http',
-    HTTPS = 'https',
-    HTTP2 = 'http2'
-}
-
 // koa2-formidable
 const bodyParser = function (opt?: { [key: string]: any }) {
     return async function(ctx: any, next: any){
@@ -44,13 +38,7 @@ interface KoaServer {
 export interface HttpServiceProviderErrorCacher {
     (error: any, ctx: any, statusCode?: number|string): void
 }
-export interface HttpServiceProviderPublicInfo {
-    protocol?: Protocol
-    host?: string
-    root?: string
-    port?: number
-    [key: string]: any
-}
+
 export interface HttpServiceProviderCorsSettings {
     credentials?: boolean
     [key: string]: any
@@ -72,7 +60,7 @@ export interface HttpServiceProviderSettings {
     safeGuard?: boolean|KoaMiddleWare
     cors?: HttpServiceProviderCorsSettings
     syslog?: boolean|KoaMiddleWare
-    public?: HttpServiceProviderPublicInfo
+    public?: utils.Http.ServiceProviderPublicInfo
     catcher?: HttpServiceProviderErrorCacher
     headers?: HttpServiceProviderHttpHeaders
     middlewares?: KoaMiddleWare[]
@@ -83,7 +71,7 @@ export interface HttpServiceProviderSettings {
 export const defaultSettings: HttpServiceProviderSettings = {
     host: '0.0.0.0',
     port: 80,
-    protocol: Protocol.HTTP,
+    protocol: utils.Http.Protocol.HTTP,
     root: '/',
     bodyParser: {
         formLimit: '10mb',
@@ -96,7 +84,7 @@ export const defaultSettings: HttpServiceProviderSettings = {
     },
     syslog: true,
     public: {
-        protocol: Protocol.HTTP,
+        protocol: utils.Http.Protocol.HTTP,
         host: '127.0.0.1',
         root: '/',
         port: 1121,
@@ -144,7 +132,7 @@ export class HttpServiceProviderServer  {
     }
 
     // public properties
-    get info(): HttpServiceProviderPublicInfo {
+    get info(): utils.Http.ServiceProviderPublicInfo {
         return this.serverSettings.public!
     }
 

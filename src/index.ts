@@ -1,5 +1,6 @@
 import * as Http from './service'
 export * from './service'
+import * as utils from 'sardines-utils'
 
 export class HttpServiceProvider extends Http.HttpServiceProviderService {
     constructor(serverSettings: Http.HttpServiceProviderSettings) {
@@ -7,4 +8,4 @@ export class HttpServiceProvider extends Http.HttpServiceProviderService {
     }
 }
 
-console.log('type of http:', typeof Http.Protocol.HTTP, ', value of http:', Http.Protocol.HTTP)
+console.log('type of http:', typeof utils.Http.Protocol.HTTP, ', value of http:', utils.Http.Protocol.HTTP)
