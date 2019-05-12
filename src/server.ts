@@ -1,4 +1,5 @@
 import * as utils from 'sardines-utils'
+import { Http } from 'sardines-utils'
 
 import * as Koa from 'koa'
 import * as formidable from 'formidable'
@@ -60,7 +61,7 @@ export interface HttpServiceProviderSettings {
     safeGuard?: boolean|KoaMiddleWare
     cors?: HttpServiceProviderCorsSettings
     syslog?: boolean|KoaMiddleWare
-    public?: utils.Http.ServiceProviderPublicInfo
+    public?: Http.ServiceProviderPublicInfo
     catcher?: HttpServiceProviderErrorCacher
     headers?: HttpServiceProviderHttpHeaders
     middlewares?: KoaMiddleWare[]
@@ -71,7 +72,7 @@ export interface HttpServiceProviderSettings {
 export const defaultSettings: HttpServiceProviderSettings = {
     host: '0.0.0.0',
     port: 80,
-    protocol: utils.Http.Protocol.HTTP,
+    protocol: Http.Protocol.HTTP,
     root: '/',
     bodyParser: {
         formLimit: '10mb',
@@ -84,7 +85,7 @@ export const defaultSettings: HttpServiceProviderSettings = {
     },
     syslog: true,
     public: {
-        protocol: utils.Http.Protocol.HTTP,
+        protocol: Http.Protocol.HTTP,
         host: '127.0.0.1',
         root: '/',
         port: 1121,
@@ -132,7 +133,7 @@ export class HttpServiceProviderServer  {
     }
 
     // public properties
-    get info(): utils.Http.ServiceProviderPublicInfo {
+    get info(): Http.ServiceProviderPublicInfo {
         return this.serverSettings.public!
     }
 
