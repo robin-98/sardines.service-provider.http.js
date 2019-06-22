@@ -1,3 +1,10 @@
+/**
+ * @author Robin Sun
+ * @email robin@naturewake.com
+ * @create date 2019-06-13 15:43:12
+ * @modify date 2019-06-13 15:43:12
+ * @desc [description]
+ */
 import * as utils from 'sardines-utils'
 import { Http } from 'sardines-utils'
 
@@ -55,7 +62,7 @@ export interface HttpServiceProviderHttpHeaders {
 export interface HttpServiceProviderSettings {
     host?: string
     port?: number
-    protocol?: string
+    protocol?: Http.Protocol
     root?: string
     bodyParser?: HttpServiceProviderBodyParserSettings|KoaMiddleWare
     safeGuard?: boolean|KoaMiddleWare
@@ -88,11 +95,11 @@ export const defaultSettings: HttpServiceProviderSettings = {
         protocol: Http.Protocol.HTTP,
         host: '127.0.0.1',
         root: '/',
-        port: 1121,
+        port: 80,
     },
     catcher: async (err, ctx, statusCode) => {
         ctx.status = statusCode || 200
-        ctx.body = utils.unifyErrMesg(err)
+        ctx.body = utils.unifyErrMesg(err, 'service provider', 'server wide error catcher')
     },
 }
 
@@ -153,7 +160,7 @@ export class HttpServiceProviderServer  {
 
     // Properties for initialization of the server
     protected get logMesgHeader(): string {
-        if (!this.errorMessageHeader) this.errorMessageHeader = `[Service Provider][${this.infoStr}`
+        if (!this.errorMessageHeader) this.errorMessageHeader = `[HTTP Service Provider][${this.infoStr}`
         return this.errorMessageHeader
     }
 
@@ -168,7 +175,7 @@ export class HttpServiceProviderServer  {
                     utils.inspectedDebugLog(`${this.logMesgHeader} Safe guard catched ERROR`, e)
                     if (typeof this.serverSettings.catcher === 'function') {
                         try {
-                            await this.serverSettings.catcher(utils.unifyErrMesg(e, 'server'), ctx)
+                            await this.serverSettings.catcher(utils.unifyErrMesg(e, 'service provider', 'server wide error catcher'), ctx)
                         } catch (err) {
                             utils.inspectedDebugLog(`${this.logMesgHeader} ERROR in custom cacher`, e)
                         }

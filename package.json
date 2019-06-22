@@ -39,12 +39,13 @@
         "url": "git+https://github.com/robin-98/sardines.service-provider.http.js.git"
     },
     "scripts": {
-        "buildProd": "tsc --build conf/tsconfig.prod.json",
+        "buildProd": "npm run clearProd && tsc --build conf/tsconfig.prod.json",
         "prod": "npm run buildProd && node lib/prod/index.js",
-        "buildDev": "tsc --build conf/tsconfig.dev.json",
+        "buildDev": "npm run clearDev && tsc --build conf/tsconfig.dev.json",
         "dev": "npm run buildDev && node lib/dev/index.js",
         "test": "mocha test/index.js",
-        "clear": "rm -rf lib/*"
+        "clearProd": "rm -rf lib/prod",
+        "clearDev": "rm -rf lib/dev"
     },
     "version": "0.0.1"
 }
