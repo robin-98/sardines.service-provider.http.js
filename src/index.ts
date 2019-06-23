@@ -100,21 +100,42 @@ const unifyServiceSettings = (service: Sardines.Service, serverSettings: Server.
     let serviceId = `${service.module}/${service.name}`
     if (additionalSettings && additionalSettings.path) httpService.path = additionalSettings.path
     else httpService.path = serviceId 
+    if (additionalSettings && additionalSettings.root) httpService.root = additionalSettings.root
     httpService.protocol = serverSettings.protocol
-    if (additionalSettings && additionalSettings.method) httpService.method
+    if (additionalSettings && additionalSettings.method) httpService.method = additionalSettings.method
     else httpService.method = Http.Method.POST
 
-    if (additionalSettings.inputParameters) httpService.inputParameters = additionalSettings.inputParameters
-    else if (service.arguments && Array.isArray(service.arguments) && service.arguments.length > 0) {
+    if (service.arguments && Array.isArray(service.arguments) && service.arguments.length > 0) {
+        let i = 0
+        let additionArgSettings = null
+        if (additionalSettings && additionalSettings.arguments) additionArgSettings = additionalSettings.arguments
+        else if (additionalSettings && additionalSettings.inputParameters) additionArgSettings = additionalSettings.inputParameters
+        let additionArgSettingsCache: {[key: string]: any}|null = null
+        if (additionArgSettings) {
+            additionArgSettingsCache = {}
+            for (let arg of additionArgSettings) {
+                if (arg.name) additionArgSettingsCache[arg.name] = arg
+            }
+        }
         for (let arg of service.arguments) {
             if (!httpService.inputParameters) httpService.inputParameters = []
-            
-            httpService.inputParameters.push(arg)
+            let additionArg:any = null
+            if (additionArgSettings) {
+                if (additionArgSettings.length === service.arguments.length) {
+                    additionArg = additionArgSettings[i]
+                } else if (arg.name && additionArgSettingsCache) {
+                    additionArg = additionArgSettingsCache[arg.name]
+                }
+            }
+            if (!additionArg) httpService.inputParameters.push(arg)
+            else httpService.inputParameters.push(Object.assign({}, arg, additionArg))
+            i++
         }
     }
 
-    if (additionalSettings.response) httpService.response = additionalSettings.response
-    else if (service.returnType) {
+    if (additionalSettings && additionalSettings.response) {
+        httpService.response = additionalSettings.response
+    } else if (service.returnType) {
         httpService.response = {type: service.returnType}
     }
     if (handler) httpService.handler = handler
@@ -222,7 +243,7 @@ export default class HttpServiceProvider extends Server.HttpServiceProviderServe
         super(serverSettings)
     }
 
-    registerService(originalServiceSettings: Http.ServiceSettings|Sardines.Service, additionalSettings:any = null, handler: any = null): Promise<any> {
+    registerService(originalServiceSettings: Http.ServiceSettings|Sardines.Service, handler: any = null, additionalSettings:any = null): Promise<any> {
         // Unify the service settings
         let unifiedServiceSettings: Http.ServiceSettings|string|null = null
         if ('path' in originalServiceSettings) {
