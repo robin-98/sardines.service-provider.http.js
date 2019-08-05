@@ -6,8 +6,7 @@
  * @desc [description]
  */
 import * as Server from './server'
-import * as utils from 'sardines-utils'
-import { Http, Sardines } from 'sardines-utils'
+import { Http, Sardines, utils } from 'sardines-core'
 import * as KoaSend from 'koa-send'
 import * as fs from 'fs'
 

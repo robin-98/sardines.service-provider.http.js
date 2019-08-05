@@ -5,8 +5,7 @@
  * @modify date 2019-06-13 15:43:12
  * @desc [description]
  */
-import * as utils from 'sardines-utils'
-import { Http } from 'sardines-utils'
+import { Http, utils } from 'sardines-core'
 
 import * as Koa from 'koa'
 import * as formidable from 'formidable'
