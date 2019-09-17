@@ -94,9 +94,9 @@ const unifyHttpServiceSettings = (originalServiceSettings: Http.ServiceSettings,
     return serviceSettings;
 }
 
-const unifyServiceSettings = (service: Sardines.Service, serverSettings: Server.HttpServiceProviderSettings, additionalSettings: any, handler: any): Http.ServiceSettings|string => {
+const unifyServiceSettings = (application: string, service: Sardines.Service, serverSettings: Server.HttpServiceProviderSettings, additionalSettings: any, handler: any): Http.ServiceSettings|string => {
     let httpService: any = {}
-    let serviceId = `${service.module}/${service.name}`
+    let serviceId = `/${application}/${service.module}/${service.name}`.replace(/\/+/g, '/')
     if (additionalSettings && additionalSettings.path) httpService.path = additionalSettings.path
     else httpService.path = serviceId 
     if (additionalSettings && additionalSettings.root) httpService.root = additionalSettings.root
@@ -242,13 +242,13 @@ export default class HttpServiceProvider extends Server.HttpServiceProviderServe
         super(serverSettings)
     }
 
-    registerService(originalServiceSettings: Http.ServiceSettings|Sardines.Service, handler: any = null, additionalSettings:any = null): Promise<any> {
+    registerService(application: string, originalServiceSettings: Http.ServiceSettings|Sardines.Service, handler: any = null, additionalSettings:any = null): Promise<any> {
         // Unify the service settings
         let unifiedServiceSettings: Http.ServiceSettings|string|null = null
         if ('path' in originalServiceSettings) {
             unifiedServiceSettings = unifyHttpServiceSettings(originalServiceSettings, this.serverSettings)
         } else {
-            unifiedServiceSettings = unifyServiceSettings(<Sardines.Service>originalServiceSettings, this.serverSettings, additionalSettings, handler)
+            unifiedServiceSettings = unifyServiceSettings(application, <Sardines.Service>originalServiceSettings, this.serverSettings, additionalSettings, handler)
         }
         
         if (!unifiedServiceSettings || typeof unifiedServiceSettings === 'string') {
