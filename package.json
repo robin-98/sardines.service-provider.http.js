@@ -42,7 +42,8 @@
     },
     "scripts": {
         "build": "npm run clear && tsc --build conf/tsconfig.json",
-        "clear": "rm -rf lib"
+        "clear": "rm -rf lib",
+        "prepublish": "npm run build"
     },
     "version": "0.2.9"
 }
