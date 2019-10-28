@@ -242,7 +242,11 @@ export default class HttpServiceProvider extends Server.HttpServiceProviderServe
         super(serverSettings)
     }
 
-    registerService(application: string, originalServiceSettings: Http.ServiceSettings|Sardines.Service, handler: any = null, additionalSettings:any = null): Promise<any> {
+    registerService(originalServiceSettings: Http.ServiceSettings|Sardines.Service, handler: any = null, additionalSettings:any = null): Promise<any> {
+        const application = (<Sardines.Service>originalServiceSettings).application || ''
+        if (!application) {
+            throw utils.unifyErrMesg('invalid service settings', 'provider', 'register service')
+        }
         // Unify the service settings
         let unifiedServiceSettings: Http.ServiceSettings|string|null = null
         if ('path' in originalServiceSettings) {
