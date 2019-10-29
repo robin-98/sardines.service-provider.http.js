@@ -63,21 +63,23 @@ const unifyHttpServiceSettings = (originalServiceSettings: Http.ServiceSettings,
         }
     }
     // Unifying input parameters
-    for (let paramDef of serviceSettings.inputParameters!) {
-        if (paramDef.position) {
-            paramDef.position = Http.ServiceInputParamPosition[paramDef.position.toLowerCase() as keyof typeof Http.ServiceInputParamPosition]
-        }
-        if (!paramDef.position) {
-            paramDef.position = Http.ServiceInputParamPosition.body
-        }
-        if (paramDef.type) {
-            paramDef.type = Http.ServiceInputParamType[paramDef.type.toLowerCase() as keyof typeof Http.ServiceInputParamType]
-        }
-        if (!paramDef.type) {
-            paramDef.type = Http.ServiceInputParamType.object
-        }
-        if (typeof paramDef.name === 'undefined') {
-            paramDef.name = ''
+    if (serviceSettings.inputParameters && Array.isArray(serviceSettings.inputParameters) && serviceSettings.inputParameters.length) {
+        for (let paramDef of serviceSettings.inputParameters) {
+            if (paramDef.position) {
+                paramDef.position = Http.ServiceInputParamPosition[paramDef.position.toLowerCase() as keyof typeof Http.ServiceInputParamPosition]
+            }
+            if (!paramDef.position) {
+                paramDef.position = Http.ServiceInputParamPosition.body
+            }
+            if (paramDef.type) {
+                paramDef.type = Http.ServiceInputParamType[paramDef.type.toLowerCase() as keyof typeof Http.ServiceInputParamType]
+            }
+            if (!paramDef.type) {
+                paramDef.type = Http.ServiceInputParamType.object
+            }
+            if (typeof paramDef.name === 'undefined') {
+                paramDef.name = ''
+            }
         }
     }
     const serviceSummary = summaryServiceSettings(serviceSettings)
