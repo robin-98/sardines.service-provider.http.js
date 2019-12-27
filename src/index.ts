@@ -244,7 +244,7 @@ export default class HttpServiceProvider extends Server.HttpServiceProviderServe
         super(serverSettings)
     }
 
-    registerService(originalServiceSettings: Http.ServiceSettings|Sardines.Service, handler: any = null, additionalSettings:any = null): Promise<any> {
+    registerService(originalServiceSettings: Http.ServiceSettings|Sardines.Service, handler: any = null, additionalSettings:any = null): Promise<Http.ServiceSettings> {
         const application = (<Sardines.Service>originalServiceSettings).application || ''
         if (!application) {
             throw utils.unifyErrMesg('invalid service settings', 'provider', 'register service')
@@ -391,13 +391,19 @@ export default class HttpServiceProvider extends Server.HttpServiceProviderServe
                         break
                     }
                     utils.debugLog(`${self.logMesgHeader} successfully registered service [${serviceSettings.summary!}] on path [${serviceSettings.path!}]`)
-                    return resolve(serviceSettings)
+                    resolve(serviceSettings)
                 } catch (err) {
                     utils.inspectedDebugLog(`${self.logMesgHeader} failed to register service [${serviceSettings.summary!}] on path [${serviceSettings.path!}]`, err)
-                    return reject(err)
+                    reject(err)
                 }
             })
         })
+    }
+
+    async removeService(serviceSettings: Http.ServiceSettings): Promise<boolean> {
+        console.log('going to remove service:', serviceSettings)
+
+        return false
     }
 }
 
