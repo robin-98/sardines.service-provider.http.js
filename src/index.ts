@@ -401,7 +401,7 @@ export default class HttpServiceProvider extends Server.HttpServiceProviderServe
     }
 
     async removeService(serviceSettings: Http.ServiceSettings): Promise<boolean> {
-        console.log('going to remove service:', serviceSettings)
+        console.log('[http provider] going to remove service:', serviceSettings)
 
         return false
     }
