@@ -401,7 +401,6 @@ export default class HttpServiceProvider extends Server.HttpServiceProviderServe
     }
 
     async removeService(serviceSettings: Http.ServiceSettings): Promise<boolean> {
-        console.log('[http provider] going to remove service:', serviceSettings)
         if (!serviceSettings || !serviceSettings.path || !serviceSettings.method) {
             throw utils.unifyErrMesg(`illegal service setting`, 'sardines-service-provider-http', 'remove service')
         }
@@ -412,12 +411,12 @@ export default class HttpServiceProvider extends Server.HttpServiceProviderServe
 
         for (let i = this.router.stack.length; i>=0; i--) {
             const service = this.router.stack[i]
-            if (!service || !service.path || !service.method || !service.method.length) continue
             console.log('[provider] typeof service:', typeof service)
             console.log('[provider] service in stack:', service)
             console.log('[provider] service.path:', typeof service.path, service.path, ', service.method:', typeof service.methods, service.methods)
             console.log('[provider] service.path === serviceSettings.path:', service.path === serviceSettings.path)
             console.log('[provider] service.methods.indexOf(serviceSettings.method.toUpperCase()):', service.methods.indexOf(serviceSettings.method.toUpperCase()))
+            if (!service || !service.path || !service.method || !service.method.length) continue
             if (service.path === serviceSettings.path && service.methods.indexOf(serviceSettings.method.toUpperCase()) >= 0) {
                 console.log('[provider] service in stack:')
                 utils.inspectedLog(service)
