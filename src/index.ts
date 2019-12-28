@@ -404,23 +404,14 @@ export default class HttpServiceProvider extends Server.HttpServiceProviderServe
         if (!serviceSettings || !serviceSettings.path || !serviceSettings.method) {
             throw utils.unifyErrMesg(`illegal service setting`, 'sardines-service-provider-http', 'remove service')
         }
-
         if (!this.router || !this.router.stack || !this.router.stack.length) {
             throw utils.unifyErrMesg(`service provider not ready`, 'sardines-service-provider-http', 'remove service')   
         }
-        console.log('[provider] going to remove service:', serviceSettings)
         for (let i = this.router.stack.length; i>=0; i--) {
             const service = this.router.stack[i]
             if (!service) continue
-            console.log('[provider] typeof service:', typeof service)
-            console.log('[provider] service in stack:', service)
-            console.log('[provider] service.path:', typeof service.path, service.path, ', service.method:', typeof service.methods, service.methods)
-            console.log('[provider] serviceSettings.path:', typeof serviceSettings.path, serviceSettings.path, ', serviceSettings.method:', typeof serviceSettings.method, serviceSettings.method)
-            console.log('[provider] service.path === serviceSettings.path:', service.path === serviceSettings.path)
-            console.log('[provider] service.methods.indexOf(serviceSettings.method.toUpperCase()):', service.methods.indexOf(serviceSettings.method.toUpperCase()))
             if (!service || !service.path || !service.methods || !service.methods.length) continue
             if (service.path === serviceSettings.path && service.methods.indexOf(serviceSettings.method.toUpperCase()) >= 0) {
-                console.log('[provider] going to remove service in router:', service, serviceSettings)
                 this.router.stack.splice(i,1)
                 return true
             }
