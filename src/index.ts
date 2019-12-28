@@ -408,7 +408,7 @@ export default class HttpServiceProvider extends Server.HttpServiceProviderServe
         if (!this.router || !this.router.stack || !this.router.stack.length) {
             throw utils.unifyErrMesg(`service provider not ready`, 'sardines-service-provider-http', 'remove service')   
         }
-
+        console.log('[provider] going to remove service:', serviceSettings)
         for (let i = this.router.stack.length; i>=0; i--) {
             const service = this.router.stack[i]
             if (!service) continue
