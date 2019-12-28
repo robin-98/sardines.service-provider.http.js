@@ -418,7 +418,7 @@ export default class HttpServiceProvider extends Server.HttpServiceProviderServe
             console.log('[provider] serviceSettings.path:', typeof serviceSettings.path, serviceSettings.path, ', serviceSettings.method:', typeof serviceSettings.method, serviceSettings.method)
             console.log('[provider] service.path === serviceSettings.path:', service.path === serviceSettings.path)
             console.log('[provider] service.methods.indexOf(serviceSettings.method.toUpperCase()):', service.methods.indexOf(serviceSettings.method.toUpperCase()))
-            if (!service || !service.path || !service.method || !service.method.length) continue
+            if (!service || !service.path || !service.methods || !service.methods.length) continue
             if (service.path === serviceSettings.path && service.methods.indexOf(serviceSettings.method.toUpperCase()) >= 0) {
                 console.log('[provider] going to remove service in router:', service, serviceSettings)
                 this.router.stack.splice(i,1)
