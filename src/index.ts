@@ -411,6 +411,7 @@ export default class HttpServiceProvider extends Server.HttpServiceProviderServe
 
         for (let i = this.router.stack.length; i>=0; i--) {
             const service = this.router.stack[i]
+            if (!service) continue
             console.log('[provider] typeof service:', typeof service)
             console.log('[provider] service in stack:', service)
             console.log('[provider] service.path:', typeof service.path, service.path, ', service.method:', typeof service.methods, service.methods)
