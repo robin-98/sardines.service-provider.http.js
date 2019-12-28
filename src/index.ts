@@ -404,6 +404,21 @@ export default class HttpServiceProvider extends Server.HttpServiceProviderServe
         console.log('[http provider] going to remove service:', serviceSettings)
         console.log('server router:')
         utils.inspectedLog(this.router)
+        if (!serviceSettings || !serviceSettings.path || !serviceSettings.method) {
+            throw utils.unifyErrMesg(`illegal service setting`, 'sardines-service-provider-http', 'remove service')
+        }
+
+        if (!this.router || !this.router.stack || !this.router.stack.length) {
+            throw utils.unifyErrMesg(`service provider not ready`, 'sardines-service-provider-http', 'remove service')   
+        }
+
+        for (let i = this.router.stack.length; i>=0; i--) {
+            const service = this.router.stack[i]
+            if (service.path === serviceSettings.path && service.methods.indexOf(serviceSettings.method.toUpperCase()) >= 0) {
+                this.router.stack.splice(i,1)
+                return true
+            }
+        }
         return false
     }
 }
