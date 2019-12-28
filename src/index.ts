@@ -412,10 +412,10 @@ export default class HttpServiceProvider extends Server.HttpServiceProviderServe
 
         for (let i = this.router.stack.length; i>=0; i--) {
             const service = this.router.stack[i]
-            console.log('[provider] service in stack:')
-            utils.inspectedLog(service)
             if (!service || !service.path || !service.method || !service.method.length) continue
             if (service.path === serviceSettings.path && service.methods.indexOf(serviceSettings.method.toUpperCase()) >= 0) {
+                console.log('[provider] service in stack:')
+                utils.inspectedLog(service)
                 this.router.stack.splice(i,1)
                 return true
             }
