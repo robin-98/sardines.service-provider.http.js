@@ -269,7 +269,11 @@ export class HttpServiceProviderServer  {
                 server.use(<KoaMiddleWare>router.routes())
                 server.use(<KoaMiddleWare>router.allowedMethods())
 
-                self.server = server.listen(self.serverSettings.port, self.serverSettings.host)
+                try {
+                    self.server = server.listen(self.serverSettings.port, self.serverSettings.host)
+                } catch (e) {
+                    console.error(`[service provider http] Error while trying to create listener on ${self.serverSettings.host}:${self.serverSettings.port}`)
+                }
                 self.router = router
                 utils.debugLog(`${self.logMesgHeader} ${self.serverSettings.protocol} server is listening: ${self.serverSettings.port}: ${self.serverSettings.host}`)
                 resolve(self.info)
