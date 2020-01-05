@@ -272,7 +272,7 @@ export class HttpServiceProviderServer  {
 
                 try {
                     self.server = server.listen(self.serverSettings.port, self.serverSettings.host)
-                    self.server.on('error', (err, data) => {
+                    self.server.on('error', (err:any , data: any) => {
                         console.error('[service provider http] Error:', err, ', data:', data)
                     })
                 } catch (e) {
