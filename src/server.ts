@@ -11,7 +11,6 @@ import * as Koa from 'koa'
 import * as formidable from 'formidable'
 import * as Cors from 'koa2-cors'
 import * as Router from 'koa-router'
-import * as proc from 'process'
 
 // koa2-formidable
 const bodyParser = function (opt?: { [key: string]: any }) {
