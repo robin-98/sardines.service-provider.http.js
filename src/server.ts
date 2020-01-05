@@ -11,6 +11,7 @@ import * as Koa from 'koa'
 import * as formidable from 'formidable'
 import * as Cors from 'koa2-cors'
 import * as Router from 'koa-router'
+import * as proc from 'process'
 
 // koa2-formidable
 const bodyParser = function (opt?: { [key: string]: any }) {
@@ -271,8 +272,11 @@ export class HttpServiceProviderServer  {
 
                 try {
                     self.server = server.listen(self.serverSettings.port, self.serverSettings.host)
+                    self.server.on('error', (err, data) => {
+                        console.error('[service provider http] Error:', err, ', data:', data)
+                    })
                 } catch (e) {
-                    console.error(`[service provider http] Error while trying to create listener on ${self.serverSettings.host}:${self.serverSettings.port}`)
+                    console.error(`[service provider http] Error while trying to create listener on ${self.serverSettings.host}:${self.serverSettings.port}`, e)
                 }
                 self.router = router
                 utils.debugLog(`${self.logMesgHeader} ${self.serverSettings.protocol} server is listening: ${self.serverSettings.port}: ${self.serverSettings.host}`)
@@ -285,3 +289,5 @@ export class HttpServiceProviderServer  {
         })
     }
 }
+
+
